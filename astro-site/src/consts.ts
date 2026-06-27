@@ -1,7 +1,7 @@
 import type { Site, Metadata, Socials } from "@types";
 
 export const SITE: Site = {
-  NAME: "Thomas Trettstadt",
+  NAME: "Tobias Rettstadt",
   EMAIL: "mail@trettstadt.de",
   NUM_POSTS_ON_HOMEPAGE: 3,
   NUM_WORKS_ON_HOMEPAGE: 2,
@@ -9,7 +9,7 @@ export const SITE: Site = {
 };
 
 export const HOME: Metadata = {
-  TITLE: "Thomas Trettstadt — IT-Consulting & Cloud Engineering",
+  TITLE: "Tobias Rettstadt — IT-Consulting & Cloud Engineering",
   DESCRIPTION: "IT-Consulting & Cloud Engineering aus Nürnberg. DSGVO-konforme Infrastruktur, Docker, Kubernetes und moderne Webentwicklung.",
 };
 
