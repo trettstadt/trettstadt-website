@@ -1,0 +1,4 @@
+config:
+  hcloud:token:
+    secure: AAABAKoRGIbLhA/lfqajoy4pXZGdUtVJzAruLXQ/JhZ+7uF72TQts00DjP6x7w1nJhKa1vNTTriOi9vLbxy+5Dc+O6xM9LYumH8u8+V9GaAvHjSWxUwKGRWJaqY68fcD
+  portfolio-web:webSshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBIwRYE2sZoDot3JCwnLBgOIude14nMWuvS1oqsnz0iW trettstadt@mpbret.local

@@ -1,0 +1,9 @@
+node_modules
+dist
+.infrastructure/
+*.iml
+.idea/
+*.log
+.DS_Store
+/infrastructure/.gradle/
+/infrastructure/build/

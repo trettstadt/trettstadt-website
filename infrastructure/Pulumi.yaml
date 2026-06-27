@@ -1,0 +1,3 @@
+name: portfolio-web
+description: Infrastructure for the portfolio website (trettstadt.de)
+runtime: java
