@@ -4,4 +4,4 @@ dateEnd: heute
 company: Tobias Rettstadt IT-Beratung (freiberuflich)
 role: Freiberufler
 ---
-freiberufliche Tätigkeit als IT-Berater
+- freiberufliche Tätigkeit als IT-Berater
