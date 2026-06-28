@@ -1,30 +1,17 @@
 # trettstadt.de
 
-Personal website and blog built with [Astro](https://astro.build) using the [AstroNano](https://github.com/markhorn-dev/astro-nano) theme, served on a dedicated Hetzner server via Docker and Caddy.
+Business website and blog built with [Astro](https://astro.build) using the [AstroNano](https://github.com/markhorn-dev/astro-nano) theme, served on a Hetzner cloud server via Docker and Caddy.
 
 ## Architecture
 
-```
-                              ┌──────────────────┐
-                              │   GitHub Actions  │
-                              │  (CI/CD Pipeline) │
-                              └────────┬─────────┘
-                                       │ docker push
-                                       ▼
-┌─────────────┐           ┌──────────────────────┐
-│  Pulumi IaC │──provisions──►  Hetzner CX23 VPS  │
-│  (Java)     │           │  nbg1, Debian 13     │
-└─────────────┘           │                      │
-                          │  ┌────────────────┐  │
-                          │  │  Caddy (TLS)   │──┼──► HTTPS :443
-                          │  │  Let's Encrypt │  │
-                          │  └───────┬────────┘  │
-                          │          │ proxy      │
-                          │  ┌───────▼────────┐  │
-                          │  │  Astro (Nginx) │  │
-                          │  │  Static Site   │  │
-                          │  └────────────────┘  │
-                          └──────────────────────┘
+```mermaid
+flowchart LR
+    gh[GitHub Actions\nCI/CD Pipeline] -->|docker push| ghcr[GHCR\nContainer Registry]
+    ghcr -->|docker compose pull| hetzner[Hetzner CX23\nnbg1, Debian 13]
+    pulumi[Pulumi IaC\nJava] -.->|provisions| hetzner
+    hetzner --> caddy[Caddy\nTLS / Let's Encrypt]
+    caddy -->|reverse proxy| astro[Astro\nNginx / Static Site]
+    caddy -->|HTTPS :443| user[Visitor]
 ```
 
 ## Project Structure
