@@ -11,7 +11,7 @@ flowchart LR
     pulumi[Pulumi IaC\nJava] -.->|provisions| hetzner
     hetzner --> caddy[Caddy\nTLS / Let's Encrypt]
     caddy -->|reverse proxy| astro[Astro\nNginx / Static Site]
-    caddy -->|HTTPS :443| user[Visitor]
+    user[Visitor] -->|HTTPS :443| caddy
 ```
 
 ## Project Structure
