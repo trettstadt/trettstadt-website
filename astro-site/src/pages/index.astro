@@ -32,22 +32,30 @@ const work = await Promise.all(
 
 <PageLayout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
-      <h4 class="animate font-semibold text-black dark:text-white">
-        Tobias Rettstadt <span class="text-xl">👋</span>
-      </h4>
       <div class="space-y-16">
         <section>
           <article class="space-y-4">
             <p class="animate">
-              IT-Consulting & Cloud Engineering aus Nürnberg. Ich konzipiere und betreibe
+              IT-Consulting & Cloud-Engineering aus Deutschland. Ich konzipiere und betreibe
               DSGVO-konforme Infrastruktur auf deutscher Cloud-Infrastruktur –
-              von schlanken Docker-Setups bis zu Kubernetes-Clustern.
+              von schlanken Docker-Setups bis zu Kubernetes-Clustern. Für kleine Projekte oder
+              Startups geben Unternehmen oft zu viel Geld bei den großen Cloud-Providern
+              (AWS, Azure, Google) aus, obwohl ein einfacheres Setup ausreichen würde. Selbst
+              ein kleiner Kubernetes-Cluster lässt sich für gut 10 EUR im Monat betreiben.
             </p>
             <p class="animate">
-              Meine Website läuft auf einem dedizierten Hetzner-Server in Nürnberg,
-              hinter Caddy mit automatischem Let's Encrypt TLS, in einem
-              Zero-Trust Docker-Netzwerk – vollständig Infrastructure-as-Code
-              verwaltet mit Pulumi und deployt via GitHub Actions.
+              Außerdem bin ich Spring-Boot-Experte mit langjähriger Erfahrung in der Entwicklung
+              sicherer und zuverlässiger Services für den Zahlungsverkehr einer Bank.
+              Konzeption und Umsetzung einer Authentifizierungs-Infrastruktur und Prozesse zur
+              rechtzeitigen Behebung von sicherheitskritischen Lücken sind dabei meine
+              Spezialgebiete.
+            </p>
+            <p class="animate">
+              Abschließend noch ein bisschen Technik: Meine Website läuft auf einem
+              Hetzner-Cloud-Server in Nürnberg, hinter Caddy mit automatischem Let's-Encrypt-TLS,
+              in einem Zero-Trust Docker-Netzwerk – vollständig verwaltet mit Pulumi und deployt via
+              Github-Actions. Der Code dafür steht auf
+              <a href="https://github.com/trettstadt/trettstadt-website">Github</a> zur Verfügung.
             </p>
           </article>
         </section>
@@ -119,12 +127,11 @@ const work = await Promise.all(
 
       <section class="animate space-y-4">
         <h5 class="font-semibold text-black dark:text-white">
-          Let's Connect
+          Kontakt
         </h5>
         <article>
           <p>
-            If you want to get in touch with me about something or just to say hi,
-            reach out on social media or send me an email.
+            Kontaktiere mich auf sozialen Medien oder schreib mir einfach eine E-Mail.
           </p>
         </article>
         <ul class="flex flex-wrap gap-2">
