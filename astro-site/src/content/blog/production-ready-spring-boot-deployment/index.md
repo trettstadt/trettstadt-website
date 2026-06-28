@@ -1,11 +1,17 @@
 ---
-title: "Spring-Boot-4-Microservice: von der Architektur bis zum Deployment"
-description: "Der Artikel zeigt, wie man einen Spring-Boot-REST-Service designed und ihn automatisiert sowohl lokal als auch in einem produktiven Kubernetes-Cluster bei Hetzner deployen kann."
+title: "Wie man einen Spring-Boot-Service für unter 15 € / Monat in Kubernetes betreibt"
+description: "Der Artikel zeigt, wie man einen Spring-Boot-REST-Service sicher und performant designed und ihn automatisiert sowohl lokal als auch in einem produktiven, kostengünstigen Kubernetes-Cluster bei Hetzner deployen kann."
 date: 2026-06-28
 draft: false
 ---
 
-https://github.com/trettstadt/spring-boot-microservice
+### Summary
+
+Startups stecken viel Geld in unnötige Cloud-Infrastruktur, bevor sie Gewinne abwerfen. Das Beispiel
+zeigt ein voll-automatisiertes IaC-Deployment auf einem Kubernetes-Cluster, und das zu nur 15 % der
+Kosten eines AWS-Kubernetes-Deployments.
+
+Projekt auf Github: https://github.com/trettstadt/spring-boot-microservice
 
 ### Architektur
 
