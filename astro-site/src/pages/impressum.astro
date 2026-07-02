@@ -1,0 +1,107 @@
+---
+import PageLayout from "@layouts/PageLayout.astro";
+import Container from "@components/Container.astro";
+
+const TITLE = "Impressum";
+const DESCRIPTION = "Impressum und Anbieterkennzeichnung nach §5 DDG.";
+---
+
+<PageLayout title={TITLE} description={DESCRIPTION}>
+  <Container>
+    <div class="space-y-10">
+      <h1 class="animate font-semibold text-black dark:text-white">
+        Impressum
+      </h1>
+
+      <section class="animate space-y-4">
+        <h2 class="font-semibold text-black dark:text-white">
+          Angaben gemäß § 5 DDG
+        </h2>
+        <address class="not-italic space-y-1">
+          <div>Tobias Rettstadt</div>
+          <div>IT-Beratung</div>
+          <div>Feldbreite 24</div>
+          <div>30926 Seelze</div>
+          <div>Deutschland</div>
+        </address>
+        <div class="space-y-1">
+          <div>
+            <span class="opacity-75">E-Mail:</span>{" "}
+            tobias(AT)rettstadt.de
+          </div>
+        </div>
+      </section>
+
+      <section class="animate space-y-4">
+        <h2 class="font-semibold text-black dark:text-white">
+          Umsatzsteuer-ID
+        </h2>
+        <p>USt-Id gemäß § 27a UStG: DE328580706</p>
+      </section>
+
+      <section class="animate space-y-4">
+        <h2 class="font-semibold text-black dark:text-white">
+          Haftung für Inhalte
+        </h2>
+        <p>
+          Als Diensteanbieter bin ich gemäß § 7 Abs. 1 DDG für eigene Inhalte
+          auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach
+          §§ 8 bis 10 DDG bin ich jedoch nicht verpflichtet, übermittelte oder
+          gespeicherte fremde Informationen zu überwachen oder nach Umständen
+          zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
+        </p>
+        <p>
+          Verpflichtungen zur Entfernung oder Sperrung der Nutzung von
+          Informationen nach den allgemeinen Gesetzen bleiben hiervon
+          unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem
+          Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei
+          Bekanntwerden von entsprechenden Rechtsverletzungen werde ich diese
+          Inhalte umgehend entfernen.
+        </p>
+      </section>
+
+      <section class="animate space-y-4">
+        <h2 class="font-semibold text-black dark:text-white">
+          Haftung für Links
+        </h2>
+        <p>
+          Mein Angebot enthält ggf. Links zu externen Webseiten Dritter, auf
+          deren Inhalte ich keinen Einfluss habe. Deshalb kann ich für diese
+          fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der
+          verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber
+          der Seiten verantwortlich.
+        </p>
+        <p>
+          Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist ohne
+          konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei
+          Bekanntwerden von Rechtsverletzungen werde ich derartige Links
+          umgehend entfernen.
+        </p>
+      </section>
+
+      <section class="animate space-y-4">
+        <h2 class="font-semibold text-black dark:text-white">
+          Urheberrecht
+        </h2>
+        <p>
+          Die durch mich erstellten Inhalte und Werke auf diesen Seiten
+          unterliegen dem deutschen Urheberrecht. Beiträge Dritter sind als
+          solche gekennzeichnet. Vervielfältigung, Bearbeitung, Verbreitung
+          und jede Art der Verwertung außerhalb der Grenzen des Urheberrechts
+          bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw.
+          Erstellers.
+        </p>
+      </section>
+
+      <section class="animate space-y-4">
+        <h2 class="font-semibold text-black dark:text-white">
+          Streitschlichtung
+        </h2>
+        <p>
+          Ich bin nicht bereit oder verpflichtet, an Streitbeilegungsverfahren
+          vor einer Verbraucherschlichtungsstelle teilzunehmen.
+        </p>
+      </section>
+    </div>
+  </Container>
+</PageLayout>

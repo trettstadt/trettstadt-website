@@ -6,4 +6,5 @@ import tailwind from "@astrojs/tailwind";
 export default defineConfig({
   site: "https://trettstadt.de",
   integrations: [mdx(), sitemap(), tailwind()],
+  prefetch: true
 });

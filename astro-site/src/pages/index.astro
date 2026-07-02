@@ -6,6 +6,8 @@ import ArrowCard from "@components/ArrowCard.astro";
 import Link from "@components/Link.astro";
 import { dateRange } from "@lib/utils";
 import { SITE, HOME, SOCIALS } from "@consts";
+import { Image } from "astro:assets";
+import deployment from "@assets/deployment.svg";
 
 const blog = (await getCollection("blog"))
   .filter(post => !post.data.draft)
@@ -35,26 +37,24 @@ const work = await Promise.all(
       <div class="space-y-16">
         <section>
           <article class="space-y-4">
+            <Image src={deployment} alt="Deployment-Architektur" data-astro-prefetch />
             <p class="animate">
-              IT-Consulting & Cloud-Engineering aus Deutschland. Ich konzipiere und betreibe
-              DSGVO-konforme Infrastruktur auf deutscher Cloud-Infrastruktur –
-              von schlanken Docker-Setups bis zu Kubernetes-Clustern. Für kleine Projekte oder
-              Startups geben Unternehmen oft zu viel Geld bei den großen Cloud-Providern
-              (AWS, Azure, Google) aus, obwohl ein einfacheres Setup ausreichen würde. Selbst
-              ein kleiner Kubernetes-Cluster lässt sich für gut 10 EUR im Monat betreiben.
+              Du betreust ein kleines Projekt oder hast ein Startup und gibst jeden Monat zu viel
+              Geld für AWS, Azure oder Google aus? Oft ist das nicht nötig. Ein schlankes Setup mit
+              einem kleinen Kubernetes-Cluster ab rund 10 EUR im Monat auf deutscher
+              Cloud-Infrastruktur reicht häufig völlig aus – DSGVO-konform und gehostet in
+              Deutschland.
             </p>
             <p class="animate">
-              Außerdem bin ich Spring-Boot-Experte mit langjähriger Erfahrung in der Entwicklung
-              sicherer und zuverlässiger Services für den Zahlungsverkehr einer Bank.
-              Daneben kümmere ich mich um die Authentifizierungs-Infrastruktur und Tools und
-              Prozesse zur rechtzeitigen Behebung von sicherheitskritischen Lücken.
+              Brauchst du außerdem einen zuverlässigen Backend-Service? Als Spring-Boot-Experte
+              mit langjähriger Erfahrung im Zahlungsverkehr einer Bank entwickle ich sichere,
+              wartbare Services und kümmere mich außerdem um die Infrastruktur für die
+              Authentifizierung von Benutzern sowie darum, dass sicherheitskritische Lücken
+              erkannt und schnell geschlossen werden.
             </p>
             <p class="animate">
-              Abschließend noch ein bisschen Technik: Meine Website läuft auf einem
-              Hetzner-Cloud-Server in Nürnberg, hinter Caddy mit automatischem Let's-Encrypt-TLS,
-              in einem Zero-Trust Docker-Netzwerk – vollständig verwaltet mit Pulumi und deployt via
-              Github-Actions. Der Code dafür steht auf
-              <a href="https://github.com/trettstadt/trettstadt-website">Github</a> zur Verfügung.
+              Meist reicht ein kurzes Gespräch, um herauszufinden, ob ich dir helfen kann.
+              Schreib mir einfach – ich melde mich in der Regel innerhalb von 24 Stunden.
             </p>
           </article>
         </section>
