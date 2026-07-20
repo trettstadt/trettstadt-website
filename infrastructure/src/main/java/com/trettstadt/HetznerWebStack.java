@@ -8,6 +8,8 @@ import com.pulumi.hcloud.Server;
 import com.pulumi.hcloud.ServerArgs;
 import com.pulumi.hcloud.SshKey;
 import com.pulumi.hcloud.SshKeyArgs;
+import com.pulumi.hcloud.Volume;
+import com.pulumi.hcloud.VolumeArgs;
 
 import java.util.List;
 
@@ -17,6 +19,8 @@ public class HetznerWebStack {
     private final Output<String> serverId;
     private final Output<String> serverName;
     private final Output<String> sshKeyName;
+    private final Output<String> postgresVolumeId;
+    private final Output<String> postgresVolumeName;
 
     public HetznerWebStack(String stackName, String sshPublicKey) {
 
@@ -67,10 +71,21 @@ public class HetznerWebStack {
                 .build()
         );
 
+        var postgresVolume = new Volume("postgres-volume",
+            VolumeArgs.builder()
+                .name("postgres")
+                .size(10)
+                .serverId(server.id().applyValue(Integer::parseInt))
+                .automount(false)
+                .build()
+        );
+
         this.serverIp = server.ipv4Address();
         this.serverId = server.id();
         this.serverName = server.name();
         this.sshKeyName = sshKey.name();
+        this.postgresVolumeId = postgresVolume.id();
+        this.postgresVolumeName = postgresVolume.name();
     }
 
     public Output<String> serverIp() {
@@ -87,5 +102,13 @@ public class HetznerWebStack {
 
     public Output<String> sshKeyName() {
         return sshKeyName;
+    }
+
+    public Output<String> postgresVolumeId() {
+        return postgresVolumeId;
+    }
+
+    public Output<String> postgresVolumeName() {
+        return postgresVolumeName;
     }
 }

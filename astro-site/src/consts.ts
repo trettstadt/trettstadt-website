@@ -1,4 +1,4 @@
-import type { Site, Metadata, Socials } from "@types";
+import type { Site, Metadata, Socials, Analytics } from "@types";
 
 export const SITE: Site = {
   NAME: "Tobias Rettstadt",
@@ -42,3 +42,8 @@ export const SOCIALS: Socials = [
     HREF: "https://github.com/trettstadt"
   },
 ];
+
+export const ANALYTICS: Analytics = {
+  WEBSITE_ID: "e2992813-804b-4c0a-bd2a-3402d276bb5e",
+  SRC: "https://analytics.trettstadt.de/script.js",
+};

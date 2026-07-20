@@ -12,6 +12,8 @@ public class App {
             ctx.export("serverId", stack.serverId());
             ctx.export("serverName", stack.serverName());
             ctx.export("sshKeyName", stack.sshKeyName());
+            ctx.export("postgresVolumeId", stack.postgresVolumeId());
+            ctx.export("postgresVolumeName", stack.postgresVolumeName());
         });
     }
 }

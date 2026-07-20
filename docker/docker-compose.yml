@@ -16,6 +16,26 @@ services:
     image: ghcr.io/trettstadt/portfolio-astro:latest
     restart: always
 
+  postgres:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD}
+    volumes:
+      - /mnt/postgres:/var/lib/postgresql
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD}@postgres:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET}
+      APP_BASE_URL: https://analytics.trettstadt.de
+
 volumes:
   caddy_data:
   caddy_config:
