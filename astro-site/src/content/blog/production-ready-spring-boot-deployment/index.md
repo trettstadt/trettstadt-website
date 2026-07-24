@@ -194,7 +194,7 @@ Im letzten Schritt werden per Helmfile alle benötigten Komponenten installiert:
 1. Cert-Manager für die Bereitstellung von Let's-Encrypt-TLS-Zertifikaten
 2. Traefik-Ingress-Controller, um die Kubernetes-Services erreichbar zu machen
 3. PostgreSQL als Datenbank, die Hetzner-Cloud-Volumes aus Datenspeicher verwendet
-4. Keycload als OIDC-Provider
+4. Keycloak als OIDC-Provider
 5. External-Secrets für die sichere Bereitstellung von Passwörtern
 6. der Service selbst
 
