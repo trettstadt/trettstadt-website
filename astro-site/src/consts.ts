@@ -10,12 +10,12 @@ export const SITE: Site = {
 
 export const HOME: Metadata = {
   TITLE: "Tobias Rettstadt — IT-Consulting & Cloud Engineering",
-  DESCRIPTION: "IT-Consulting & Cloud Engineering aus Nürnberg. DSGVO-konforme Infrastruktur, Docker, Kubernetes und moderne Webentwicklung.",
+  DESCRIPTION: "IT-Consulting & Cloud-Engineering aus Deutschland. DSGVO-konforme Infrastruktur, Docker, Kubernetes und moderne Webentwicklung.",
 };
 
 export const BLOG: Metadata = {
   TITLE: "Blog",
-  DESCRIPTION: "Fachartikel zu Cloud Engineering, DevOps und IT-Infrastruktur.",
+  DESCRIPTION: "Fachartikel zu Cloud-Engineering, DevOps und IT-Infrastruktur.",
 };
 
 export const WORK: Metadata = {
