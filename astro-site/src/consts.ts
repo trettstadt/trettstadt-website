@@ -42,3 +42,11 @@ export const SOCIALS: Socials = [
     HREF: "https://github.com/trettstadt"
   },
 ];
+
+export const BOOKING: {
+  EMBED_URL: string;
+  CAL_LINK: string;
+} = {
+  EMBED_URL: "https://book.trettstadt.de/embed/embed.js",
+  CAL_LINK: "trettstadt/beratung",
+};

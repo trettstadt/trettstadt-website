@@ -19,3 +19,25 @@ analytics.trettstadt.de {
         Referrer-Policy "strict-origin-when-cross-origin"
     }
 }
+
+book.trettstadt.de {
+    reverse_proxy calcom:3000
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Content-Security-Policy "frame-ancestors 'self' https://trettstadt.de"
+        Access-Control-Allow-Origin "https://trettstadt.de"
+    }
+}
+
+meet.trettstadt.de {
+    reverse_proxy jitsi-web:80
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}

@@ -55,6 +55,13 @@ public class HetznerWebStack {
                         .protocol("tcp")
                         .sourceIps("0.0.0.0/0", "::/0")
                         .port("443")
+                        .build(),
+                    FirewallRuleArgs.builder()
+                        .description("Jitsi Meet video bridge (UDP RTP)")
+                        .direction("in")
+                        .protocol("udp")
+                        .sourceIps("0.0.0.0/0", "::/0")
+                        .port("10000")
                         .build()
                 )
                 .build()
