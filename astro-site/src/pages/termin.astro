@@ -1,0 +1,54 @@
+---
+import Container from "@components/Container.astro";
+import PageLayout from "@layouts/PageLayout.astro";
+---
+
+<PageLayout title="Termin buchen" description="Vereinbare online ein Beratungsgespräch.">
+  <Container>
+    <div class="space-y-10">
+      <h1 class="animate font-semibold text-black dark:text-white">
+        Termin buchen
+      </h1>
+      <section class="animate space-y-4">
+        <p>
+          Wähle einen freien Slot für ein unverbindliches Beratungsgespräch.
+          Sobald du gebucht hast, erhältst du eine Bestätigung per E-Mail mit
+          allen weiteren Details.
+        </p>
+<div id="cal-embed" style="min-height: 600px;"></div>
+        <script is:inline>
+          (function (C, A, L) {
+            let p = function (a, ar) { a.q.push(ar); };
+            let d = C.document;
+            C.Cal = C.Cal || function () {
+              let cal = C.Cal, ar = arguments;
+              if (!cal.loaded) {
+                cal.ns = {};
+                cal.q = cal.q || [];
+                d.head.appendChild(d.createElement("script")).src = A;
+                cal.loaded = true;
+              }
+              if (ar[0] === L) {
+                const api = function () { p(api, arguments); };
+                api.q = api.q || [];
+                if (typeof ar[1] === "string") {
+                  cal.ns[ar[1]] = cal.ns[ar[1]] || api;
+                  p(cal.ns[ar[1]], ar);
+                  p(cal, ["initNamespace", ar[1]]);
+                } else p(cal, ar);
+                return;
+              }
+              p(cal, ar);
+            };
+          })(window, "https://book.trettstadt.de/embed/embed.js", "init");
+          window.Cal("init", { origin: "https://book.trettstadt.de" });
+          window.Cal("inline", {
+            calLink: "trettstadt/beratung",
+            elementOrSelector: "#cal-embed",
+            config: { layout: "month_view" }
+          });
+        </script>
+      </section>
+    </div>
+  </Container>
+</PageLayout>

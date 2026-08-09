@@ -1,0 +1,21 @@
+FROM calcom/cal.com:v6.2.0
+
+# Next.js NEXT_PUBLIC_* env vars are inlined at build time.
+# Since we use the pre-built image, patch the built .next files directly.
+
+# 1. Replace baked-in Terms and Privacy URLs
+RUN find / -path '*/.next/*' -type f \( -name '*.js' -o -name '*.json' \) \
+    -exec sed -i \
+    -e 's|https://cal.com/terms|https://trettstadt.de/impressum|g' \
+    -e 's|https://cal.com/privacy|https://trettstadt.de/impressum|g' \
+    {} +
+
+# 2. Replace baked-in APP_NAME (only exact quoted string "Cal.com" / "Cal.diy",
+#    not substrings like "cal.com" in URLs or "Cal.com, Inc." in company name)
+RUN find / -path '*/.next/*' -type f \( -name '*.js' -o -name '*.json' \) \
+    -exec sed -i \
+    -e 's/"Cal\.com"/"Tobias Rettstadt"/g' \
+    -e "s/'Cal\.com'/'Tobias Rettstadt'/g" \
+    -e 's/"Cal\.diy"/"Tobias Rettstadt"/g' \
+    -e "s/'Cal\.diy'/'Tobias Rettstadt'/g" \
+    {} +
