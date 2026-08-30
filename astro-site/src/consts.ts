@@ -9,23 +9,23 @@ export const SITE: Site = {
 };
 
 export const HOME: Metadata = {
-  TITLE: "Tobias Rettstadt — IT-Consulting & Cloud Engineering",
-  DESCRIPTION: "IT-Consulting & Cloud-Engineering aus Deutschland. DSGVO-konforme Infrastruktur, Docker, Kubernetes und moderne Webentwicklung.",
+  TITLE: "Tobias Rettstadt — IT-Consulting & Software-Architektur | Banking & Modernisierung",
+  DESCRIPTION: "Hands-on IT-Architektur & Lead-Entwicklung für Banken und FinTechs. Risikofreie Modernisierung geschäftskritischer Mainframe-Systeme mit Spring Boot & Kubernetes.",
 };
 
 export const BLOG: Metadata = {
-  TITLE: "Blog",
-  DESCRIPTION: "Fachartikel zu Cloud-Engineering, DevOps und IT-Infrastruktur.",
+  TITLE: "Fachartikel & Architecture Insights",
+  DESCRIPTION: "Praxisberichte zu Mainframe-Modernisierung, Spring Boot, Helm-Governance und DORA-Compliance im regulierten Finanzsektor.",
 };
 
 export const WORK: Metadata = {
-  TITLE: "Work",
-  DESCRIPTION: "Stationen meiner beruflichen Laufbahn.",
+  TITLE: "Erfahrung & Referenzen",
+  DESCRIPTION: "Stationen und geschäftskritische Modernisierungsprojekte im Banken- und Enterprise-Umfeld.",
 };
 
 export const PROJECTS: Metadata = {
-  TITLE: "Projects",
-  DESCRIPTION: "Eine Übersicht meiner Projekte mit Links zu Repositories und Demos.",
+  TITLE: "Blueprints & Open Source",
+  DESCRIPTION: "Praxiserprobte Architektur-Blueprints, Spring-Boot-Templates und standardisierte Helm-Charts.",
 };
 
 export const SOCIALS: Socials = [

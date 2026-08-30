@@ -6,8 +6,6 @@ import ArrowCard from "@components/ArrowCard.astro";
 import Link from "@components/Link.astro";
 import { dateRange } from "@lib/utils";
 import { SITE, HOME, SOCIALS } from "@consts";
-import { Image } from "astro:assets";
-import deployment from "@assets/deployment.svg";
 
 const blog = (await getCollection("blog"))
   .filter(post => !post.data.draft)
@@ -37,35 +35,61 @@ const work = await Promise.all(
       <div class="space-y-16">
         <section>
           <article class="space-y-4">
-            <Image src={deployment} alt="Deployment-Architektur" data-astro-prefetch />
+            <h1 class="animate font-semibold text-2xl text-black dark:text-white">
+              Geschäftskritische Kernsysteme modernisieren – ohne Ausfallzeiten und ohne Big-Bang-Risiko.
+            </h1>
             <p class="animate">
-              Du betreust ein kleines Projekt oder hast ein Startup und gibst jeden Monat zu viel
-              Geld für AWS, Azure oder Google aus? Oft ist das nicht nötig. Ein schlankes Setup mit
-              einem kleinen Kubernetes-Cluster ab rund 10 EUR im Monat auf deutscher
-              Cloud-Infrastruktur reicht häufig völlig aus – DSGVO-konform und gehostet in
-              Deutschland.
+              Als selbstständiger <strong>Senior Software Architect & Lead Developer</strong> unterstütze ich Banken, Zahlungsdienstleister und regulierte Enterprise-Kunden dabei, monolithische Mainframe- und Legacy-Systeme in hochverfügbare, audit-konforme <strong>Spring-Boot- und Kubernetes-Architekturen</strong> zu überführen.
             </p>
             <p class="animate">
-              Brauchst du außerdem einen zuverlässigen Backend-Service? Als Spring-Boot-Experte
-              mit langjähriger Erfahrung im Zahlungsverkehr einer Bank entwickle ich sichere,
-              wartbare Services und kümmere mich außerdem um die Infrastruktur für die
-              Authentifizierung von Benutzern sowie darum, dass sicherheitskritische Lücken
-              erkannt und schnell geschlossen werden.
+              <strong>Strategy meets Code:</strong> Keine reinen Folienkonzepte, sondern lauffähiger Code und praxiserprobte Bereitstellung – von der schrittweisen Migration im laufenden Betrieb über robuste Java 21 / Spring-Boot-Services bis hin zu standardisierten Helm-Charts für zentrale Plattformteams. Praxiserprobt im hochregulierten Landesbanken-Umfeld (BaFin, DORA, ISO 20022).
             </p>
             <p class="animate">
-              Meist reicht ein kurzes Gespräch, um herauszufinden, ob ich dir helfen kann.
-              Schreib mir einfach – ich melde mich in der Regel innerhalb von 24 Stunden.
+              Planen Sie eine Modernisierung oder suchen Sie einen Sparringpartner für Ihre Architektur? In einem unverbindlichen 30-minütigen Fachgespräch klären wir Machbarkeit, Risiken und konkrete nächste Schritte.
             </p>
+            <p class="animate pt-2">
+              <Link href="/termin" underline={false} reload>
+                <span class="inline-block px-4 py-2 rounded border border-black/15 dark:border-white/30 hover:border-black/25 hover:dark:border-white/50 transition-colors duration-300 ease-in-out font-medium">
+                  30 Min. Fachgespräch vereinbaren &rarr;
+                </span>
+              </Link>
+            </p>
+            <div class="animate pt-4">
+              <pre class="mermaid">
+flowchart LR
+    Clients["Banking-Clients &amp; Web-Frontends"]
+    
+    Gateway["API Gateway &amp; Routing<br/><i>(Request-Verteilung)</i>"]
+    
+    subgraph Legacy ["Altsysteme (Paralleler Rückbau)"]
+        direction TB
+        Host["Mainframe (COBOL/DB2)"]
+        WAS["WebSphere / Monolithen"]
+    end
+
+    subgraph Modern ["Zielarchitektur (Kubernetes)"]
+        direction TB
+        Services["Spring Boot Services<br/><i>(Modul für Modul)</i>"]
+        Helm["Helm-Charts &amp; GitOps"]
+        Services --> Helm
+    end
+
+    Clients --> Gateway
+    Gateway -->|"Bestand"| Legacy
+    Gateway -->|"Migriert"| Modern
+    Modern <-.->|"Datenbrücke"| Legacy
+              </pre>
+            </div>
           </article>
         </section>
 
       <section class="animate space-y-6">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
           <h5 class="font-semibold text-black dark:text-white">
-            Latest posts
+            Fachartikel & Insights
           </h5>
           <Link href="/blog">
-            See all posts
+            Alle Beiträge
           </Link>
         </div>
         <ul class="flex flex-col gap-4">
@@ -80,10 +104,10 @@ const work = await Promise.all(
       <section class="animate space-y-6">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
           <h5 class="font-semibold text-black dark:text-white">
-            Work Experience
+            Berufserfahrung & Referenzen
           </h5>
           <Link href="/work">
-            See all work
+            Vollständige Übersicht
           </Link>
         </div>
         <ul class="flex flex-col space-y-4">
@@ -109,10 +133,10 @@ const work = await Promise.all(
       <section class="animate space-y-6">
         <div class="flex flex-wrap gap-y-2 items-center justify-between">
           <h5 class="font-semibold text-black dark:text-white">
-            Recent projects
+            Blueprints & Projekte
           </h5>
           <Link href="/projects">
-            See all projects
+            Alle Projekte
           </Link>
         </div>
         <ul class="flex flex-col gap-4">
@@ -126,16 +150,15 @@ const work = await Promise.all(
 
       <section class="animate space-y-4">
         <h5 class="font-semibold text-black dark:text-white">
-          Kontakt
+          Kontakt & Sparringpartner
         </h5>
         <article>
           <p>
-            Meist reicht ein kurzes Gespräch, um herauszufinden, ob ich dir
-            helfen kann. Buch dir direkt einen Termin oder schreib mir eine E-Mail.
+            Sie möchten ein konkretes Vorhaben besprechen, Legacy-Workloads migrieren oder Architektur-Standards etablieren? Buchen Sie direkt ein 30-minütiges Fachgespräch oder schreiben Sie mir eine Nachricht.
           </p>
           <p class="mt-4">
             <Link href="/termin" underline={false} reload>
-              <span class="inline-block px-4 py-2 rounded border border-black/15 dark:border-white/30 hover:border-black/25 hover:dark:border-white/50 transition-colors duration-300 ease-in-out">
+              <span class="inline-block px-4 py-2 rounded border border-black/15 dark:border-white/30 hover:border-black/25 hover:dark:border-white/50 transition-colors duration-300 ease-in-out font-medium">
                 Termin buchen
               </span>
             </Link>
@@ -143,7 +166,7 @@ const work = await Promise.all(
         </article>
         <article>
           <p>
-            Kontaktiere mich auf sozialen Medien oder schreib mir einfach eine E-Mail.
+            Sie erreichen mich auch auf LinkedIn, XING oder direkt per E-Mail.
           </p>
         </article>
         <ul class="flex flex-wrap gap-2">
