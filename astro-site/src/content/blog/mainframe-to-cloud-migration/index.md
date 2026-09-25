@@ -1,210 +1,39 @@
 ---
-title: "Wie man einen Spring-Boot-Service für unter 15 € / Monat in Kubernetes betreibt"
-description: "Der Artikel zeigt, wie man einen Spring-Boot-REST-Service sicher und performant designed und ihn automatisiert sowohl lokal als auch in einem produktiven, kostengünstigen Kubernetes-Cluster bei Hetzner deployen kann."
-date: 2026-06-28
-draft: false
+title: "Fallstricke bei der Migration vom Host (Mainframe) in die Cloud und wie man sie vermeidet"
+description: "Der Artikel beschreibt Ansätze, wie kritische Workloads vom Mainframe in die Cloud überführt werden können."
+date: 2026-09-07
+draft: true
 ---
 
-### Summary
+### Überblick
 
-Startups stecken viel Geld in unnötige Cloud-Infrastruktur, bevor sie Gewinne abwerfen. Das Beispiel
-zeigt ein voll-automatisiertes IaC-Deployment auf einem Kubernetes-Cluster, und das zu nur 15 % der
-Kosten eines AWS-Kubernetes-Deployments.
+Bei vielen Banken ist die Entscheidung, den Host abzulösen, bereits gefallen. Hauptgründe sind hohe Fixkosten und der Weggang von Entwicklern mit entsprechendem Know-how. Der Artikel zeigt, was im Detail zu beachten ist, wenn Anwendungen vom Host in die Cloud migriert werden sollen. Eine der wichtigsten Fragen dabei ist, wie man doppelte Verarbeitungen zuverlässig in einem verteilten System verhindert. Außerdem wird darauf eingegangen, dass eine 1:1-Umsetzung von Batch-Jobs nicht die beste Wahl ist, wenn diese eigentlich Events verarbeiten. 
 
-Projekt auf Github: https://github.com/trettstadt/spring-boot-microservice
+### Ausgangslage
 
-### Architektur
+Bei den Legacy-Anwendungen auf dem Host gibt es in der Regel sowohl Batch-Jobs, die zeitgesteuert ausgeführt werden, und IMS- und CICS-Transaktionen, bei denen ein Event von außen die Verarbeitung anstößt. Diese können in Assembler, C, COBOL oder Java implementiert sein. Ob die Verarbeitung aktuell im Batch oder in Transaktionen erfolgt, hat naturgemäß einen großen Einfluss auf die Zielarchitektur. Die eingesetzten Programmiersprachen unterscheiden sich jedoch hauptsächlich darin, wie gut sich der vorhandene Programmcode noch analysieren lässt.
 
-Microservices lassen sich auf unzählige Arten entwickeln, aber wegen der Stabilität und der hohen
-Verfügbarkeit von Entwicklern hat sich im Enterprise-Umfeld Java mit Spring-Boot bewährt. Für den
-Service wird außerdem die Ports-and-Adapters-Architektur verwendet, die eine strenge Trennung
-zwischen Geschäftslogik und Technik sicherstellt und damit eine sehr gute Testbarkeit durch Unit-
-und Integrationstests ermöglicht. Alle Architekturentscheidungen sind hier als ADR (architecture 
-decision records) festgehalten:
-https://github.com/trettstadt/spring-boot-microservice/tree/main/docs/adr 
+Im Falle vom Assembler ist neben der Analyse des Codes fast immer eine fachliche Rekonstruktion notwendig, weil sonst leicht Details unter den Tisch fallen. Bei Cobol ist die Codeanalyse schon leichter, d. h. hier kann man die Anforderungen an neue Services etwas direkter aus den bestehenden Programmen ableiten. Sind Jobs und Transaktionen bereits in Java implementiert, ist es natürlich sehr viel einfacher, die Businesslogik in einen Spring-Boot-Service zu übernehmen.
 
-![](https://github.com/trettstadt/spring-boot-microservice/blob/main/docs/architecture.png?raw=true)
+### Umsetzung von Batch-Jobs in der Cloud
 
-### Entwicklung
+Bei Transaktionen ist es relativ eindeutig, dass sie in der Cloud-Welt ebenfalls als eventgesteuerte Services implementiert werden sollten. Und bei Batch-Jobs liegt der Gedanke nah, dass man diese in ein Batch-Framework wie *Spring Batch* überführt. In der Praxis findet man aber viele Beispiele, in denen Batch-Jobs auch für die Verarbeitung von eingehenden Nachrichten verwendet wurden. Hier lohnt es sich auf jeden Fall, im ersten Schritt zu schauen, ob es sich um eine echte Batch-Verarbeitung oder in Wirklichkeit um eine versteckte eventgesteuerte Verarbeitung handelt.
 
-Ein wesentlicher Punkt ist die korrekte Konfiguration der Web-Security, wobei ich standardmäßig
-einen Audience-Validator hinzufüge, um sicherzustellen, dass jeder Service nur mit einem Token
-aufgerufen werden kann, das auch für ihn bestimmt ist.
+In einem Beispiel aus der Praxis wurden Batch-Jobs für die Erstellung und Verarbeitung von Kontoauszügen verwendet. Hier gab es sowohl für die Erstellung von Kontoauszügen (camt.053 an Bankrechner) aus den Tagesumsätzen als auch für den Eingang von Kontoauszügen von anderen Banken (Empfang von camt.053 über SWIFT) zeitgesteuerte Jobs. Während es im ersten Fall vollkommen in Ordnung ist, die Jobs jeden Abend laufen zu lassen, soll beim Eingang von Kontoauszügen die Verarbeitung und ggf. Weiterleitung möglichst zeitnah erfolgen. Bei der Auszugserstellung würde man also mit einem zeitgesteuerten Service starten, wobei die weitere Verarbeitung dann auch asynchron durch weitere Services erfolgen kann. Wie das technisch funktioniert, ist weiter unten erklärt. Für den Eingang von Kontoauszügen hingegen ist es besser, direkt einen eventgesteuerten Service zu implementieren, der direkt bei Eingang eines Auszugs mit der Verarbeitung startet.
 
-```java
-/**
- * Spring security configuration for REST.
- */
-@Configuration
-@EnableWebSecurity
-public class WebSecurityConfiguration {
+### Wann kommen Batch-Frameworks dennoch infrage?
 
-  /**
-   * Forcing to use separate tokens for each target service improves security.
-   */
-  @Bean
-  OAuth2TokenValidator<Jwt> audienceValidator() {
-    return new JwtClaimValidator<List<String>>(AUD,
-        aud -> aud.contains("spring-boot-microservice"));
-  }
+| Kriterium          | Batch                                                                                   | Event-basiert                                                                           |
+|--------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| Zeitpunkt / Latenz | Berichte, Tagesabschlüsse, die zu einem bestimmten Zeitpunkt vorliegen müssen           | Ergebnis muss ohne Verzögerung vorliegen                                                |
+| Datenvolumen       | Massenverarbeitung                                                                      | Verarbeitung einzelner Nachrichten                                                      |
+| Fehlertoleranz     | Fehler treten selten auf bzw. es ist ein sauberer Rerun notwendig                       | Eine fehlerhafte Nachricht darf die Verarbeitung anderer Nachrichten nicht beeinflussen |
+| abhängige Systeme  | Aufrufer arbeiten ebenfalls batch-basiert                                               | Aufrufer erwartet zeitnah eine Antwort                                                  |
+| Konsistenz         | Daten müssen zu einem bestimmten Zeitpunkt (*Cut-off*) in einem bestimmten Zustand sein | Konsistenz muss für jede einzelne Transaktion gewährleistet sein                        |
 
-  @Bean
-  SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-        .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/actuator/**").permitAll()
-            .anyRequest().authenticated()
-        )
-        .oauth2ResourceServer(oauth2 -> oauth2
-            .jwt(withDefaults())
-        )
-        .oauth2Client(withDefaults());
-    return http.build();
-  }
-}
-```
+Aus der Tabelle kann man ablesen, dass sowohl die Art der Daten und Verarbeitung, die Abhängigkeit zu anderen Systemen, die Fehlertoleranz, das Volumen und die Anforderung an die Konsistenz der Daten zu betrachten sind. Ein klassischer Fall, in dem man auch in der Cloud noch Batch-Jobs einsetzen würde, ist die Erstellung von Berichten, für die umfangreiche Berechnung und Datenanalysen notwendig sind. Eingehende Nachrichten wie Zahlungen oder Kontoauszüge sollten jedoch immer eventgetrieben implementiert werden.
 
-Bei *Ports and adapters* entsteht ein recht hoher Overhead, weil man Models zwischen Adaptern, Ports
-und Domain mappen muss. Hier hilft Mapstruct, indem es automatisch Mapper aus einem Interface
-erzeugt.
+Wenn nur einzelne Funktionen zeitgesteuert ausgeführt werden müssen, ist ein Batch-Framework zu viel Overhead. Hier könnte man entweder mit einfachen Timern arbeiten oder, wenn sowieso eine Prozess-Engine wie *Camunda* zum Einsatz kommt, Workflows mit zeitgesteuerten Triggern dafür verwenden.
 
-```java
-/**
- * MapStruct mapper for converting between BookingOutPort and BookingDomain.
- */
-@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface FindBookingsMapper {
+### Wie verhindert man Doppelverarbeitung bei gleichzeitiger Fehlertoleranz?
 
-  /**
-   * Converts a booking output port to a domain booking.
-   *
-   * @param bookingOutPort the booking output port
-   * @return the domain booking
-   */
-  BookingDomain fromPort(BookingOutPort bookingOutPort);
-
-  /**
-   * Converts a list of booking output ports to a list of domain bookings.
-   *
-   * @param bookingOutPorts the list of booking output ports
-   * @return the list of domain bookings
-   */
-  List<BookingDomain> fromPort(List<BookingOutPort> bookingOutPorts);
-}
-```
-
-Die *injectorStrategy* wurde wegen der besseren Testbarkeit in Unit-Tests gewählt und durch das
-*componentModel* *spring* steht jeder Mapper direkt als Bean zur Verfügung.
-
-Es wird ein *API first*-Ansatz verwendet, d. h. die API wird in einer OpenAPI-Spec definiert und die
-Klassen mit dem *OpenAPI generator* erzeugt.
-
-```yaml
-openapi: "3.0.1"
-
-info:
-  title: Example API for bookings
-  version: "1.0.0"
-
-paths:
-  /bookings:
-    get:
-      description: Returns a list of all bookings.
-      operationId: getBookings
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BookingList'
-
-components:
-  schemas:
-    Booking:
-      type: object
-      properties:
-        id:
-          type: number
-          format: int64
-        description:
-          type: string
-    BookingList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Booking'
-```
-
-Das Datenbankschema wird mit *Liquibase* verwaltet. Dabei kann Liquibase Changelogs aus den
-JPA-Entities generieren. Dazu wird das Liquibase-Maven-Plugin verwendet.
-
-```yaml
-databaseChangeLog:
-  - changeSet:
-      id: 1776502256728-1
-      author: trettstadt (generated)
-      changes:
-        - createTable:
-            columns:
-              - column:
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    primaryKeyName: booking_entryPK
-                  name: id
-                  type: BIGINT
-              - column:
-                  name: description
-                  type: VARCHAR(255)
-            tableName: booking_entry
-```
-
-### Lokales Deployment
-
-Für die Entwicklung ist es unheimlich wichtig, den Service lokal laufen lassen und debuggen zu 
-können. Für diesen Fall werden alle notwendigen Komponenten als Docker-Container zur Verfügung 
-gestellt, die mit Docker-Compose schnell gestartet werden können. Es wird außerdem ein 
-Spring-Profil *localdev* eingerichtet, in dem bereits alles für die lokale Entwicklung konfiguriert 
-ist.
-
-Um Fehler nachstellen zu können, die nur in der Kubernetes-Umgebung auftreten, kann der Service
-auch per Helm in einem lokalen Cluster installiert werden. Hierfür wird das Helm-Chart aus dem
-`gitops`-Verzeichnis mit der `values-local.yaml` verwendet.
-
-### Deployment im produktiven Kubernetes-Cluster
-
-Voraussetzung für das Deployment ist, dass ein Docker-Image für den Service gebaut wurde. Das
-passiert automatisch in einem Github-Workflow
-(https://github.com/trettstadt/spring-boot-microservice/actions/workflows/maven.yml), der das Image
-in die Github-Container-Registry (GHCR) pushed.
-
-Das Deployment besteht aus den Komponenten Server, Kubernetes und Deployment mit Helm, die hier 
-alle im gleichen Repo liegen, während Server und Kubernetes in der Praxis getrennt davon
-konfiguriert werden. Die grundlegende Infrastruktur (Cloud-Server, Firewall, etc.) wird mit Pulumi
-deployed, d. h. es reicht der Befehl `pulumi up`, um die Server zu erstellen oder Änderungen daran
-zu deployen. Die Einrichtung von Kubernetes erfolgt im nächsten Schritt mit Ansible. Hier wird
-einfach das Ansible-Playbook ausgeführt, damit Kubernetes auf den beiden Servern eingerichtet wird.
-Danach steht direkt zwei Kubernetes-Nodes zur Verfügung.
-
-Im letzten Schritt werden per Helmfile alle benötigten Komponenten installiert:
-
-1. Cert-Manager für die Bereitstellung von Let's-Encrypt-TLS-Zertifikaten
-2. Traefik-Ingress-Controller, um die Kubernetes-Services erreichbar zu machen
-3. PostgreSQL als Datenbank, die Hetzner-Cloud-Volumes aus Datenspeicher verwendet
-4. Keycloak als OIDC-Provider
-5. External-Secrets für die sichere Bereitstellung von Passwörtern
-6. der Service selbst
-
-Wenn die Infrastruktur wächst, wird das Helmfile zu unübersichtlich und man würde dann auf *ArgoCD*
-wechseln, welches die Synchronisation von Helm-Charts aus dem Git-Branch automatisieren kann und
-damit echtes GitOps umsetzt.
-
-### Observability
-
-Es ist essenziell, den Service im laufenden Betrieb überwachen zu können, damit man im Fehlerfall
-oder bei Performanceproblemen schnell sehen kann, wo das Problem liegt. Dazu sendet der Service
-Metriken und Traces an *Grafana Cloud* und ein öffentliches Dashboard ist hier
-zu finden: https://lavendertoast2486.grafana.net/public-dashboards/6353c61287bf461f9b25450a7a56c8d3
