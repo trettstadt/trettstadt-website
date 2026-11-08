@@ -57,7 +57,7 @@ reload the existing Caddy container during the DNS cutover below.
      http://10.100.0.2:8082/api/health
    ```
 
-The NixOS peer uses the CX23's static public IPv4 `49.12.234.229:51820` as its
+The NixOS peer uses the CX23's static public IPv4 (`<CX23_IPV4>:51820`) as its
 endpoint. If the CX23 is replaced and receives a different primary IPv4, update
 `gatewayEndpoint` in `nix-config/expense-splitter.nix`. The home server initiates
 the tunnel and sends a keepalive, so no inbound WireGuard port is needed at home
@@ -80,10 +80,10 @@ ssh root@"$CX23_IPV4" 'cd /opt/portfolio-web && docker compose exec -T caddy cad
 ssh root@"$CX23_IPV4" 'cd /opt/portfolio-web && docker compose exec -T caddy wget -qO- --header="Host: expense-splitter.trettstadt.de" http://10.100.0.2:8082/api/health'
 ```
 
-Set the A record for `expense-splitter.trettstadt.de` to `49.12.234.229` and the
-AAAA record to the CX23's actual IPv6 `2a01:4f8:1c1c:e236::1`. Keep the home
-NixOS public ingress enabled during propagation. Once both records resolve to
-the CX23, reload its existing Caddy container so it can obtain the certificate:
+Set the A record for `expense-splitter.trettstadt.de` to the CX23's public IPv4
+(`<CX23_IPV4>`) and the AAAA record to its public IPv6 (`<CX23_IPV6>`). Keep the
+home NixOS public ingress enabled during propagation. Once both records resolve
+to the CX23, reload its existing Caddy container so it can obtain the certificate:
 
 ```sh
 ssh root@"$CX23_IPV4" 'cd /opt/portfolio-web && docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile'
