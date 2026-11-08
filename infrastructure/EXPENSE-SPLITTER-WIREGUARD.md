@@ -63,6 +63,12 @@ endpoint. If the CX23 is replaced and receives a different primary IPv4, update
 the tunnel and sends a keepalive, so no inbound WireGuard port is needed at home
 and a changing home IPv6 prefix is fine.
 
+Both tunnel ends use MTU `1280`. The home uplink drops larger packets (the
+default WireGuard MTU of 1420 blackholes large responses such as the 305 KB
+JavaScript bundle while small API responses still work). Keep the MTU on both
+ends in sync; a larger value will make the frontend hang after the first few
+kilobytes.
+
 ## Caddy and DNS cutover
 
 Once the tunnel is up and the private HTTP health check succeeds, validate the

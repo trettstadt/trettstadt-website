@@ -27,7 +27,8 @@ trap 'rm -f "$config_tmp"' EXIT
   printf '%s\n' \
     '[Interface]' \
     'Address = 10.100.0.1/24' \
-    'ListenPort = 51820'
+    'ListenPort = 51820' \
+    'MTU = 1280'
   printf 'PrivateKey = %s\n' "$(cat /etc/wireguard/expense-splitter-private.key)"
   printf '\n%s\n' '[Peer]' \
     "PublicKey = $home_public_key" \
