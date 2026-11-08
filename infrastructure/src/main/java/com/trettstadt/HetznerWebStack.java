@@ -57,6 +57,13 @@ public class HetznerWebStack {
                         .port("443")
                         .build(),
                     FirewallRuleArgs.builder()
+                        .description("WireGuard tunnel from the home server")
+                        .direction("in")
+                        .protocol("udp")
+                        .sourceIps("0.0.0.0/0", "::/0")
+                        .port("51820")
+                        .build(),
+                    FirewallRuleArgs.builder()
                         .description("Jitsi Meet video bridge (UDP RTP)")
                         .direction("in")
                         .protocol("udp")

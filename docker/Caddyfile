@@ -41,3 +41,10 @@ meet.trettstadt.de {
         Referrer-Policy "strict-origin-when-cross-origin"
     }
 }
+
+expense-splitter.trettstadt.de {
+    reverse_proxy http://10.100.0.2:8082 {
+        # Pass only Caddy's resolved client address, not a client-supplied XFF chain.
+        header_up X-Forwarded-For {client_ip}
+    }
+}

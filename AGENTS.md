@@ -61,7 +61,7 @@ Triggered automatically on push to `main` **only when files under `astro-site/**
 2. Push to `ghcr.io/trettstadt/portfolio-astro:latest`.
 3. SSH to prod server (`PROD_SERVER_IP` secret), `cd /opt/portfolio-web && docker compose pull && docker compose up -d`.
 
-Changes to `docker/`, `infrastructure/`, or `README.md` do **not** trigger deploy. To roll out a `docker/` or Caddyfile change, run `docker compose up -d` on the server manually.
+Changes to `docker/`, `infrastructure/`, or `README.md` do **not** trigger deploy. To roll out a Caddyfile change, copy `docker/Caddyfile` to `/opt/portfolio-web/Caddyfile` and run `docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile` on the server. The Compose project is rooted at `/opt/portfolio-web`; `docker compose up -d` alone does not copy the repository's nested Caddyfile.
 
 ## Infrastructure
 
