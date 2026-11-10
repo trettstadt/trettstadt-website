@@ -55,3 +55,18 @@ secret-santa.trettstadt.de {
         header_up X-Forwarded-For {client_ip}
     }
 }
+
+einkauf.trettstadt.de {
+    reverse_proxy http://10.100.0.2:8084 {
+        # Pass only Caddy's resolved client address, not a client-supplied XFF chain.
+        header_up X-Forwarded-For {client_ip}
+    }
+}
+
+# The Authelia login that einkauf.trettstadt.de (and the other protected apps) redirect to.
+auth.trettstadt.de {
+    reverse_proxy http://10.100.0.2:8085 {
+        # Pass only Caddy's resolved client address, not a client-supplied XFF chain.
+        header_up X-Forwarded-For {client_ip}
+    }
+}

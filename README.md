@@ -11,7 +11,7 @@ flowchart LR
     pulumi[Pulumi IaC\nJava] -.->|provisions| hetzner
     hetzner --> caddy[Caddy\nTLS / Let's Encrypt]
     caddy -->|reverse proxy| astro[Astro\nNginx / Static Site]
-    caddy -->|WireGuard · 10.100.0.0/24| home[Expense Splitter, Secret Santa\nHome NixOS]
+    caddy -->|WireGuard · 10.100.0.0/24| home[Expense Splitter, Secret Santa,\nFriendly Shopping List, Authelia login\nHome NixOS]
     user[Visitor] -->|HTTPS :443| caddy
 ```
 
@@ -59,11 +59,14 @@ pulumi up --stack prod-web
 
 Requires `hcloud:token` and `webSshPublicKey` to be configured.
 
-The CX23 Caddy also serves the locally hosted Expense Splitter and Secret Santa through a
-WireGuard tunnel. See [`infrastructure/EXPENSE-SPLITTER-WIREGUARD.md`](infrastructure/EXPENSE-SPLITTER-WIREGUARD.md)
-for the tunnel setup and the staged DNS cutover instructions, and
+The CX23 Caddy also serves the locally hosted Expense Splitter, Secret Santa and Friendly
+Shopping List (with the Authelia login it needs) through a WireGuard tunnel. See
+[`infrastructure/EXPENSE-SPLITTER-WIREGUARD.md`](infrastructure/EXPENSE-SPLITTER-WIREGUARD.md)
+for the tunnel setup and the staged DNS cutover instructions,
 [`infrastructure/SECRET-SANTA-GATEWAY.md`](infrastructure/SECRET-SANTA-GATEWAY.md) for what
-Secret Santa adds on top.
+Secret Santa adds on top, and
+[`infrastructure/FRIENDLY-SHOPPING-LIST-GATEWAY.md`](infrastructure/FRIENDLY-SHOPPING-LIST-GATEWAY.md)
+for Friendly Shopping List and the Authelia login.
 
 ## License
 
