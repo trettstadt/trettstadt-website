@@ -22,6 +22,9 @@ on those ports.
   tunnel peer `10.100.0.1/32` and passes only that address to the backend, so the backend's rate
   limits (`TRUST_PROXY=1`) count individual clients. The `wg0` interface and Caddy's
   `trusted_proxies` setting come from `nix-config/expense-splitter.nix`; keep that module enabled.
+- The public Caddy sees the real IPv4 and IPv6 address of every visitor (it runs in host network
+  mode, see [Real client address](EXPENSE-SPLITTER-WIREGUARD.md#real-client-address-ipv4-and-ipv6)),
+  so the backend's per-client rate limits work for both IP versions.
 
 The Hetzner Cloud Firewall needs no change (80/443 and UDP 51820 are already open), so no
 `pulumi up` is required. The Caddyfile change is not part of the Astro auto-deploy path; copy it

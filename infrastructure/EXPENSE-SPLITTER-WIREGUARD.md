@@ -8,6 +8,9 @@ forwards requests over WireGuard to the NixOS home server on TCP port 8082. TLS 
 
 - `../docker/Caddyfile` adds the Expense Splitter virtual host and overwrites
   `X-Forwarded-For` with the client address seen by the public Caddy.
+- `../docker/docker-compose.yml` runs the public Caddy with `network_mode: host` so that it sees the
+  real IPv4 **and** IPv6 client address; see
+  [Real client address](#real-client-address-ipv4-and-ipv6).
 - `src/main/java/com/trettstadt/HetznerWebStack.java` opens UDP 51820 in the
   Hetzner Cloud Firewall.
 - `setup-expense-splitter-wireguard.sh` installs WireGuard on the Debian CX23,
@@ -81,7 +84,9 @@ ssh root@"$CX23_IPV4" 'cd /opt/portfolio-web && docker compose exec -T caddy wge
 ```
 
 Set the A record for `expense-splitter.trettstadt.de` to the CX23's public IPv4
-(`<CX23_IPV4>`) and the AAAA record to its public IPv6 (`<CX23_IPV6>`). Keep the
+(`<CX23_IPV4>`) and the AAAA record to its public IPv6 (`<CX23_IPV6>`). `<CX23_IPV6>` is the
+server's own address (it ends in `::1`); the network address of its /64 (ending in `::`) is not
+configured on the server and never answers. Keep the
 home NixOS public ingress enabled during propagation. Once both records resolve
 to the CX23, reload its existing Caddy container so it can obtain the certificate:
 
@@ -101,6 +106,103 @@ The home Caddy trusts forwarded client addresses only from the tunnel peer
 Express. Keep the backend's `TRUST_PROXY=loopback`: rate limits continue to see
 individual client IPs. Port 8082 is bound to the WireGuard address and allowed
 only on interface `wg0`.
+
+## Real client address (IPv4 and IPv6)
+
+The public Caddy forwards the client address it sees to the home backends (`X-Forwarded-For`), and
+the backends use it for rate limits and for Authelia's log and lockout. That only works if Caddy
+sees the real address of every visitor, over IPv4 and over IPv6.
+
+**What was wrong.** With published ports (`80:80`, `443:443`) Docker handles IPv4 with iptables
+DNAT, which keeps the client address. This host has no IPv6 rules at all (there is no
+`/etc/docker/daemon.json`, so `ip6tables` is off), so IPv6 connections were accepted by
+`docker-proxy` (`-host-ip :: ... -container-ip <Caddy's IPv4 address>`) and opened again from the
+bridge gateway. Every IPv6 visitor reached Caddy, and through it the home backends and Authelia, as
+`172.18.0.1`. Authelia's `remote_ip` showed the real address for `curl -4` and `172.18.0.1` for
+`curl -6`, which is why Authelia's lockout by address was left off.
+
+**What changed.** Caddy runs with `network_mode: host`, so it listens on the host's ports 80 and 443
+itself and sees both address families directly. No port is published for it any more. The
+WireGuard upstreams (`10.100.0.2:8082` to `8085`) are now reached straight through `wg0` with source
+address `10.100.0.1`, which is what the home Caddy's `trusted_proxies` expects; Docker NAT is no
+longer involved.
+
+What host mode means in practice:
+
+- Caddy cannot resolve Docker service names. The apps served from the CX23 itself are published on
+  the loopback interface only, and the Caddyfile points to those ports:
+
+  | App | Loopback port | Caddy site |
+  |---|---|---|
+  | `astro-site` | `127.0.0.1:18080` | `trettstadt.de` |
+  | `umami` | `127.0.0.1:18081` | `analytics.trettstadt.de` |
+  | `calcom` | `127.0.0.1:18082` | `book.trettstadt.de` |
+  | `jitsi-web` | `127.0.0.1:18083` | `meet.trettstadt.de` |
+
+  A new app on the CX23 needs `ports: ["127.0.0.1:<port>:<container port>"]` in the compose file and
+  `reverse_proxy 127.0.0.1:<port>` in the Caddyfile. Use the literal `127.0.0.1` (the published
+  ports listen on IPv4 only). They are not reachable from outside.
+- Caddy's admin endpoint (`localhost:2019`) now lives on the host's loopback instead of the
+  container's. `docker compose exec -T caddy caddy validate|reload` works unchanged.
+- Caddy still starts an HTTP/3 listener on UDP 443; the Hetzner firewall only allows TCP 443, as
+  before.
+
+### Check
+
+From the home server. The bogus token only produces an error log line, which shows the address
+Authelia saw:
+
+```sh
+curl -4 -s -X POST https://auth.trettstadt.de/api/reset-password/identity/finish \
+  -H 'Content-Type: application/json' -d '{"token":"probe"}'
+journalctl -u authelia-main --since -1min -o cat | grep -o '"remote_ip":"[^"]*"'
+# repeat both commands with curl -6
+```
+
+`curl -4` must log the home IPv4 address and `curl -6` an address from the home IPv6 prefix, never
+`172.18.0.1`. On the CX23, Caddy itself must hold the public ports and Docker must publish nothing
+for it:
+
+```sh
+ss -tlnp | grep -E ':(80|443)\b'                          # users:(("caddy",...)), not docker-proxy
+docker ps --filter name=caddy --format '{{.Names}} {{.Ports}}'   # no ports listed
+```
+
+Every site must also answer over both IP versions: `curl -4 -I` and `curl -6 -I` for each host in
+the Caddyfile (add `--resolve "<host>:443:[<CX23_IPV6>]"` for a name that has no AAAA record).
+
+### Rolling out and rolling back
+
+The compose file and the Caddyfile are not part of the Astro auto-deploy, and they have to change
+together: the old Caddyfile names Docker services, which a host-mode Caddy cannot resolve. On the
+CX23, in `/opt/portfolio-web`, with backups next to the originals:
+
+```sh
+cp -p docker-compose.yml docker-compose.yml.pre-hostnet && cp -p Caddyfile Caddyfile.pre-hostnet
+scp docker/docker-compose.yml root@"$CX23_IPV4":/opt/portfolio-web/docker-compose.yml   # from this repository
+docker compose config -q
+# 1. publish the four apps on loopback; the old bridged Caddy keeps serving meanwhile
+docker compose up -d astro-site umami calcom jitsi-web
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:18080/        # and :18081, :18082, :18083
+# 2. copy the Caddyfile in place (scp keeps the inode of the bind mount), validate, recreate Caddy
+scp docker/Caddyfile root@"$CX23_IPV4":/opt/portfolio-web/Caddyfile      # from this repository
+docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile
+docker compose up -d caddy
+```
+
+Step 1 restarts the four apps (Cal.com needs about a minute to become healthy). Step 2 leaves ports
+80 and 443 without a listener for about two seconds and cuts open Jitsi websockets; certificates
+stay in the `caddy_data` volume. To roll back, restore both files and recreate Caddy; the loopback
+ports of the other containers can stay:
+
+```sh
+cp -p Caddyfile.pre-hostnet Caddyfile && cp -p docker-compose.yml.pre-hostnet docker-compose.yml
+docker compose up -d caddy
+```
+
+`docker compose config` prints `$` as `$$`. A service whose `.env` values contain a dollar sign
+(`calcom`) therefore shows a `config --hash` that differs from its running container. That is not
+drift: `docker compose up` does not escape, so it keeps such a container as it is.
 
 ## Rollback
 

@@ -4,20 +4,22 @@ services:
   caddy:
     image: caddy:alpine
     restart: always
-    ports:
-      - "80:80"
-      - "443:443"
+    # Host networking so that Caddy sees the real IPv4 AND IPv6 client address. With published
+    # ports, Docker's userland proxy hands IPv6 visitors to Caddy as the bridge gateway
+    # (172.18.0.1), because Docker adds no IPv6 NAT rules on this host. Caddy therefore cannot use
+    # Docker service names: the apps it serves itself are published on 127.0.0.1 below (ports
+    # 18080-18083) and the Caddyfile points to those. See infrastructure/EXPENSE-SPLITTER-WIREGUARD.md.
+    network_mode: host
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
-    networks:
-      - default
-      - meet.jitsi
 
   astro-site:
     image: ghcr.io/trettstadt/portfolio-astro:latest
     restart: always
+    ports:
+      - "127.0.0.1:18080:80"
 
   postgres:
     image: postgres:17-alpine
@@ -34,6 +36,8 @@ services:
     restart: always
     depends_on:
       - postgres
+    ports:
+      - "127.0.0.1:18081:3000"
     environment:
       DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD}@postgres:5432/umami
       APP_SECRET: ${UMAMI_APP_SECRET}
@@ -46,6 +50,8 @@ services:
     restart: always
     depends_on:
       - postgres
+    ports:
+      - "127.0.0.1:18082:3000"
     env_file: .env
     environment:
       NEXT_PUBLIC_WEBAPP_URL: https://book.trettstadt.de
@@ -67,6 +73,8 @@ services:
     restart: always
     depends_on:
       - jitsi-jvb
+    ports:
+      - "127.0.0.1:18083:80"
     environment:
       PUBLIC_URL: https://meet.trettstadt.de
       XMPP_DOMAIN: meet.jitsi

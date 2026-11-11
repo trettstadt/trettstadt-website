@@ -39,6 +39,7 @@ pulumi up --stack prod-web
 - **ESLint enforces double quotes and semicolons** (`.eslintrc.cjs`). Run `npm run lint:fix` before committing rather than reformatting by hand.
 - **Site content is German**; code identifiers and most commit messages are English. Recent commits mix German prose with `fix:`/`docs:`/`feat:` prefixes — match the surrounding style.
 - **`SITE.EMAIL` in `src/consts.ts` is intentionally obfuscated** as `tobias(AT)rettstadt.de` to deter scraping. Do not "fix" it to a real `mailto:` address.
+- **Caddy on the CX23 runs with `network_mode: host`** (`docker/docker-compose.yml`) so the home backends see real IPv4 *and* IPv6 client addresses. It cannot resolve Docker service names: apps served from the CX23 are published on `127.0.0.1:18080`–`18083` and the Caddyfile points to `127.0.0.1:<port>`. A new local app needs both a loopback `ports:` entry and a Caddyfile upstream. Compose changes are not auto-deployed either: copy the file to `/opt/portfolio-web`, then `docker compose up -d <service>` (details in `infrastructure/EXPENSE-SPLITTER-WIREGUARD.md`).
 - **AstroNano base theme**: structural components (`Container`, `Header`, `Footer`, `PageLayout`, `ArrowCard`, `Link`) come from the theme. Prefer extending over replacing.
 
 ## Content collections

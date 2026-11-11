@@ -28,7 +28,7 @@ flowchart LR
 
 - **Frontend:** Astro 5, Tailwind CSS, TypeScript
 - **Infrastructure:** Pulumi (Java) + Hetzner Cloud
-- **Server:** Docker Compose, Caddy (auto TLS)
+- **Server:** Docker Compose, Caddy (auto TLS, host network so it sees real IPv4 and IPv6 client addresses)
 - **CI/CD:** GitHub Actions → GHCR → SSH deploy
 
 ## Development

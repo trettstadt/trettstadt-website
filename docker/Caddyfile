@@ -1,5 +1,8 @@
+# Caddy runs with network_mode: host (docker-compose.yml) so that it sees the real IPv4 and IPv6
+# client address. It cannot resolve Docker service names: the apps served from this server are
+# published on 127.0.0.1 only (astro-site 18080, umami 18081, calcom 18082, jitsi-web 18083).
 trettstadt.de {
-    reverse_proxy astro-site:80
+    reverse_proxy 127.0.0.1:18080
 
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
@@ -11,7 +14,7 @@ trettstadt.de {
 }
 
 analytics.trettstadt.de {
-    reverse_proxy umami:3000
+    reverse_proxy 127.0.0.1:18081
 
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
@@ -21,7 +24,7 @@ analytics.trettstadt.de {
 }
 
 book.trettstadt.de {
-    reverse_proxy calcom:3000
+    reverse_proxy 127.0.0.1:18082
 
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
@@ -33,7 +36,7 @@ book.trettstadt.de {
 }
 
 meet.trettstadt.de {
-    reverse_proxy jitsi-web:80
+    reverse_proxy 127.0.0.1:18083
 
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"

@@ -28,6 +28,10 @@ IPv4-only clients can only use it if they can also reach the Authelia login, so
   whatever the client sent and sets them from Authelia's answer. The public Caddy does not touch
   them, so a client cannot supply them through the gateway either.
 - Authelia's `access_control` already covers `*.trettstadt.de`; nothing changes there.
+- The public Caddy sees the real IPv4 and IPv6 address of every visitor (it runs in host network
+  mode, see [Real client address](EXPENSE-SPLITTER-WIREGUARD.md#real-client-address-ipv4-and-ipv6)),
+  so `remote_ip` in Authelia's log is the visitor's own address for both IP versions and a lockout
+  by address can rely on it. The probe that shows it is described there.
 
 The Hetzner Cloud Firewall needs no change (80/443 and UDP 51820 are already open), so no
 `pulumi up` is required. The Caddyfile change is not part of the Astro auto-deploy path; copy it
